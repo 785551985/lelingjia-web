@@ -50,6 +50,21 @@ router.beforeEach(
     //   return next();
     // }
 
+    // 0、检查并吸收 URL 传参免登 token，吸收后立即无痕擦除 URL 中的 token 参数
+    if (to.query.token && typeof to.query.token === 'string') {
+      const cleanToken = (to.query.token as string).replace(/^Bearer\s+/i, '');
+      userStore.setToken(cleanToken);
+      localStorage.setItem('Admin-Token', cleanToken);
+      try {
+        const userObj = JSON.parse(localStorage.getItem('user') || '{}');
+        userObj.token = cleanToken;
+        localStorage.setItem('user', JSON.stringify(userObj));
+      } catch (ignored) {}
+
+      // 立刻替换路由，清除地址栏上的 ?token= 敏感参数
+      return next({ path: to.path, query: {}, replace: true });
+    }
+
     // 4、判断访问页面是否在路由白名单地址[静态路由]中，如果存在直接放行。
     if (ROUTER_WHITE_LIST.includes(to.path))
       return next();

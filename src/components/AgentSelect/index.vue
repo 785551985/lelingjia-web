@@ -25,9 +25,7 @@ onMounted(async () => {
 });
 
 const currentAgentName = computed(
-  () => agentStore.currentAgentInfo && agentStore.currentAgentInfo.agentDescribe
-    ? agentStore.currentAgentInfo.agentDescribe
-    : agentStore.currentAgentInfo?.agentName,
+  () => agentStore.currentAgentInfo?.agentName || '',
 );
 
 // 选择器展示文案：选了工作流 → 工作流标题；否则 → 智能体名
@@ -127,9 +125,9 @@ function handleUnbindWorkflow() {
             :class="{ 'is-select': !isWorkflow && item.agentName === agentStore.currentAgentInfo?.agentName }"
             @click="handleClick(item)"
           >
-            <div>{{ item.agentDescribe || item.agentName }}</div>
-            <div v-if="item.modelName" class="agent-sub font-size-11px opacity-60">
-              {{ item.modelName }}
+            <div>{{ item.agentName }}</div>
+            <div v-if="item.agentDescribe" class="agent-sub font-size-11px opacity-60 text-ellipsis">
+              {{ item.agentDescribe }}
             </div>
           </div>
         </div>

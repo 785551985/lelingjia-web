@@ -22,13 +22,8 @@ const popoverRef = ref();
 // 弹出面板内容
 const popoverList = ref([
   {
-    key: '1',
-    title: '收藏夹',
-    icon: 'book-mark-fill',
-  },
-  {
-    key: '2',
-    title: '设置',
+    key: 'admin',
+    title: '返回管理后台',
     icon: 'settings-4-fill',
   },
   {
@@ -45,13 +40,9 @@ const popoverList = ref([
 // 点击
 function handleClick(item: any) {
   switch (item.key) {
-    case '1':
-      ElMessage.warning('暂未开放');
-      console.log('点击了收藏夹');
-      break;
-    case '2':
-      ElMessage.warning('暂未开放');
-      console.log('点击了设置');
+    case 'admin':
+      popoverRef.value?.hide?.();
+      window.location.href = 'http://localhost:5666/';
       break;
     case '4':
       popoverRef.value?.hide?.();

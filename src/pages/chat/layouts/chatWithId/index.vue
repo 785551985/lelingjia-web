@@ -18,6 +18,7 @@ import { useUserStore } from '@/stores/modules/user';
 import { codeXRender } from '@/utils/markdownRenderers';
 import ToolCallCard from './components/ToolCallCard.vue';
 import WfNodeCard from './components/WfNodeCard.vue';
+import SourceReferenceCard, { type KnowledgeSource } from './components/SourceReferenceCard.vue';
 
 type MessageItem = BubbleProps & {
   key: number;
@@ -27,6 +28,7 @@ type MessageItem = BubbleProps & {
   thinlCollapse?: boolean;
   reasoning_content?: string;
   class?: string;
+  sources?: KnowledgeSource[];
   /** 工作流人机交互：渲染为输入框气泡 */
   isWorkflowFeedback?: boolean;
   /** 人机交互提示词 */
@@ -390,6 +392,21 @@ function handleDataChunk(chunk: AnyObject | string): boolean {
       if (eventType === 'done' || dataObj?.done === true) {
         console.log('[SSE] 流结束');
         return true;
+      }
+
+      if (eventType === 'sources' && dataObj) {
+        const lastMessage = bubbleItems.value[bubbleItems.value.length - 1];
+        if (lastMessage) {
+          try {
+            const rawContent = dataObj.content || dataObj;
+            const parsedSources = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;
+            lastMessage.sources = Array.isArray(parsedSources) ? parsedSources : [];
+            bubbleItems.value = [...bubbleItems.value];
+          } catch (err) {
+            console.warn('[SSE] 解析 sources 异常:', err);
+          }
+        }
+        return false;
       }
 
       if (eventType === 'mcp' && dataObj) {
@@ -824,14 +841,20 @@ function sendMessageByKey(key: number) {
               </el-button>
             </div>
           </div>
-          <XMarkdown
-            v-else-if="item.content && item.role === 'system'"
-            :markdown="item.content"
-            :code-x-render="codeXRender"
-            class="markdown-body"
-            :themes="{ light: 'github-light', dark: 'github-dark' }"
-            default-theme-mode="dark"
-          />
+          <template v-else-if="item.role === 'system'">
+            <XMarkdown
+              v-if="item.content"
+              :markdown="item.content"
+              :code-x-render="codeXRender"
+              class="markdown-body"
+              :themes="{ light: 'github-light', dark: 'github-dark' }"
+              default-theme-mode="dark"
+            />
+            <SourceReferenceCard
+              v-if="item.content && item.sources && item.sources.length"
+              :sources="item.sources"
+            />
+          </template>
           <div v-if="item.content && item.role === 'user'" class="userContent">
             <div class="user-bubble" :class="{ editing: editingMessageKeys.includes(item.key) }">
               <template v-if="!editingMessageKeys.includes(item.key)">

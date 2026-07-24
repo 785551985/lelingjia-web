@@ -153,8 +153,9 @@ export const useSessionStore = defineStore('session', () => {
         params: { id: `${res.data}` },
       });
     }
-    catch (error) {
+    catch (error: any) {
       console.error('createSessionList错误:', error);
+      ElMessage.error(error?.message || error?.msg || '创建会话失败，请确认后端服务已成功启动');
     }
   };
 

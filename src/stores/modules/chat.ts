@@ -63,7 +63,8 @@ export const useChatStore = defineStore('chat', () => {
       const originalContent = item.content as string;
 
       const thinkContent = extractThkContent(originalContent);
-      const afterThinkContent = extractThkContentAfter(originalContent);
+      let afterThinkContent = extractThkContentAfter(originalContent);
+      const { sources, cleanContent } = extractSources(afterThinkContent);
 
       const result = {
         ...item,
@@ -78,7 +79,8 @@ export const useChatStore = defineStore('chat', () => {
         typing: false,
         reasoning_content: thinkContent,
         thinkingStatus: 'end',
-        content: afterThinkContent,
+        content: cleanContent,
+        sources: sources,
         thinlCollapse: false,
         noStyle: !isUser,
       };
@@ -86,6 +88,22 @@ export const useChatStore = defineStore('chat', () => {
       return result;
     });
   };
+
+  function extractSources(content: string) {
+    if (!content) return { sources: [], cleanContent: content };
+    const regex = /<sources>([\s\S]*?)<\/sources>/;
+    const match = content.match(regex);
+    if (match) {
+      try {
+        const sources = JSON.parse(match[1]);
+        const cleanContent = content.replace(regex, '').trim();
+        return { sources, cleanContent };
+      } catch (e) {
+        console.error('Failed to parse sources JSON', e);
+      }
+    }
+    return { sources: [], cleanContent: content };
+  }
 
   // 获取当前会话的聊天记录
   const requestChatList = async (sessionId: string) => {

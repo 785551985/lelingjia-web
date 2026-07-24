@@ -149,10 +149,11 @@
 import { ref, computed, nextTick, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores'
+import { getKnowledgeList } from '@/api/knowledge'
 
 const userStore = useUserStore()
 
-// 模拟知识库数据
+// 知识库数据列表（初始化后将从后端真实获取）
 const kbList = ref([
   { id: 1, kbName: '集团合规公共库', kbType: '1' },
   { id: 2, kbName: '绍兴分公司制度库', kbType: '2' }
@@ -336,7 +337,24 @@ const sendMessage = async () => {
   }
 }
 
+const loadKbList = async () => {
+  try {
+    const res = await getKnowledgeList({ pageNum: 1, pageSize: 50 })
+    if (res && res.rows && res.rows.length > 0) {
+      kbList.value = res.rows.map(item => ({
+        id: item.id,
+        kbName: item.name,
+        kbType: item.scopeLevel === 1 ? '1' : '2'
+      }))
+      currentKbId.value = kbList.value[0].id
+    }
+  } catch (err) {
+    console.warn('获取真实知识库列表失败，使用默认列表', err)
+  }
+}
+
 onMounted(() => {
+  loadKbList()
   scrollToBottom()
 })
 </script>

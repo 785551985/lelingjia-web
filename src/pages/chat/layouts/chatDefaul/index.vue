@@ -13,6 +13,11 @@ const senderValue = ref('');
 const senderRef = ref<InstanceType<typeof ChatSender> | null>(null);
 
 async function handleSubmit(content: string) {
+  if (!userStore.token) {
+    userStore.ensureLogin('/chat', '登录后即可开始 AI 知识库提问');
+    return;
+  }
+
   localStorage.setItem('chatContent', content);
 
   senderValue.value = '';

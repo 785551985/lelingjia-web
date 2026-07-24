@@ -40,6 +40,11 @@ function handleCtrlK(event: KeyboardEvent) {
 onKeyStroke(event => event.ctrlKey && event.key.toLowerCase() === 'k', handleCtrlK, {
   passive: false,
 });
+function goToAdmin() {
+  const token = userStore.token;
+  const targetUrl = `http://localhost:5666/${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+  window.location.href = targetUrl;
+}
 </script>
 
 <template>
@@ -68,7 +73,17 @@ onKeyStroke(event => event.ctrlKey && event.key.toLowerCase() === 'k', handleCtr
         </div>
 
         <!-- 右边 -->
-        <div class="right-box flex h-full items-center pr-20px flex-shrink-0 mr-auto flex-row">
+        <div class="right-box flex h-full items-center pr-20px flex-shrink-0 mr-auto flex-row gap-12px">
+          <el-button
+            v-show="userStore.token"
+            type="primary"
+            plain
+            size="small"
+            style="border-radius: 6px; font-weight: 500;"
+            @click="goToAdmin"
+          >
+            返回管理后台
+          </el-button>
           <Avatar v-show="userStore.token" />
           <LoginBtn v-show="!userStore.token" />
         </div>
