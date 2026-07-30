@@ -80,12 +80,27 @@ export const useUserStore = defineStore(
       isAuthExpiredHandling.value = false;
     };
 
+    const fetchUserInfo = async () => {
+      try {
+        const { getUserInfo } = await import('@/api/auth');
+        const res = await getUserInfo();
+        if (res && (res as any).user) {
+          setUserInfo((res as any).user);
+        } else if (res) {
+          setUserInfo(res as any);
+        }
+      } catch (err) {
+        console.warn('获取用户信息失败:', err);
+      }
+    };
+
     return {
       token,
       setToken,
       clearToken,
       userInfo,
       setUserInfo,
+      fetchUserInfo,
       clearUserInfo,
       logout,
       loginRedirectPath,

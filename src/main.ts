@@ -6,6 +6,7 @@ import ElementPlusX from 'vue-element-plus-x';
 import App from './App.vue';
 import router from './routers';
 import store from './stores';
+import { useUserStore } from './stores/modules/user';
 import './styles/index.scss';
 import 'virtual:uno.css';
 import 'element-plus/dist/index.css';
