@@ -6,13 +6,27 @@ import { useRoute, useRouter } from 'vue-router';
 import { get_session } from '@/api';
 import logo from '@/assets/images/logo.png';
 import Collapse from '@/layouts/components/Header/components/Collapse.vue';
-import { useDesignStore } from '@/stores';
+import { useDesignStore, useUserStore } from '@/stores';
 import { useSessionStore } from '@/stores/modules/session';
 
 const route = useRoute();
 const router = useRouter();
 const designStore = useDesignStore();
 const sessionStore = useSessionStore();
+const userStore = useUserStore();
+
+const companyName = computed(() => {
+  const info = userStore.userInfo as any;
+  return (
+    info?.companyName
+    || info?.deptName
+    || info?.tenantName
+    || info?.dept?.deptName
+    || info?.user?.companyName
+    || info?.user?.deptName
+    || '企业知识库'
+  );
+});
 
 const sessionId = computed(() => route.params?.id);
 const conversationsList = computed(() => sessionStore.sessionList);
@@ -187,7 +201,7 @@ function handleMenuCommand(command: string, item: ConversationItem<ChatSessionVo
       <div v-if="!designStore.isCollapse" class="aside-header">
         <div class="flex items-center gap-8px hover:cursor-pointer" @click="handleCreatChat">
           <el-image :src="logo" alt="logo" fit="cover" class="logo-img" />
-          <span class="logo-text max-w-150px text-overflow">乐龄家 AI</span>
+          <span class="logo-text max-w-150px text-overflow" :title="companyName">{{ companyName }}</span>
         </div>
         <Collapse class="ml-auto" />
       </div>

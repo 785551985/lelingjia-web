@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
 import loginEnterpriseHero from '@/assets/images/login-enterprise-hero.png';
-import logoPng from '@/assets/images/logo.png';
-import SvgIcon from '@/components/SvgIcon/index.vue';
 import { useUserStore } from '@/stores';
 import { useLoginFormStore } from '@/stores/modules/loginForm';
 import AccountPassword from './components/FormLogin/AccountPassword.vue';
@@ -33,10 +31,7 @@ watch(
   { immediate: true },
 );
 
-// 切换二维码登录
-function toggleLoginMode() {
-  isQrMode.value = !isQrMode.value;
-}
+
 
 // 点击遮罩层关闭对话框（触发过渡动画）
 function handleMaskClick() {
@@ -64,33 +59,16 @@ function onAfterLeave() {
           :class="{ 'register-dialog': loginFormType === 'RegistrationForm' }"
         >
           <section class="login-section">
-            <div class="login-header">
-              <div class="logo-wrap">
-                <img :src="logoPng" class="logo-img" alt="乐龄家大健康科技">
-                <span class="logo-text">乐龄家 AI 知识库</span>
-              </div>
-
-              <button
-                class="mode-toggle"
-                type="button"
-                :title="isQrMode ? '切换到账号登录' : '切换到扫码登录'"
-                :aria-label="isQrMode ? '切换到账号登录' : '切换到扫码登录'"
-                @click.stop="toggleLoginMode"
-              >
-                <SvgIcon :name="isQrMode ? 'zhanghaodenglu' : 'erweimadenglu'" />
-              </button>
-            </div>
-
             <div class="login-content" :class="{ 'register-content': loginFormType === 'RegistrationForm' }">
               <div v-if="!isQrMode" class="welcome-block">
                 <p class="welcome-eyebrow">
                   {{ loginFormType === 'RegistrationForm' ? '创建新账号' : '欢迎回来' }}
                 </p>
                 <h2 class="welcome-title">
-                  {{ loginFormType === 'RegistrationForm' ? '开启你的智能工作空间' : '登录 乐龄家 AI 知识库' }}
+                  {{ loginFormType === 'RegistrationForm' ? '开启你的智能工作空间' : '登录 企业知识库' }}
                 </h2>
                 <p class="welcome-desc">
-                  {{ loginFormType === 'RegistrationForm' ? '使用账号快速注册，立即体验企业级 AI 知识库。' : '继续你的知识问答与检索，数据将安全同步。' }}
+                  {{ loginFormType === 'RegistrationForm' ? '使用账号快速注册，立即体验企业知识库。' : '继续你的知识问答与检索，数据将安全同步。' }}
                 </p>
               </div>
 

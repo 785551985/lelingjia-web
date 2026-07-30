@@ -1,5 +1,6 @@
 <!-- 欢迎提示词 -->
 <script setup lang="ts">
+import { computed, onMounted } from 'vue';
 import { Typewriter } from 'vue-element-plus-x';
 import { useTimeGreeting } from '@/hooks/useTimeGreeting';
 import { useUserStore } from '@/stores';
@@ -7,7 +8,25 @@ import { useUserStore } from '@/stores';
 const greeting = useTimeGreeting();
 const userStore = useUserStore();
 
-const username = computed(() => userStore.userInfo?.nickName ?? userStore.userInfo?.username ?? '乐龄家大健康 AI 助手');
+onMounted(() => {
+  if (userStore.token && !userStore.userInfo) {
+    userStore.fetchUserInfo();
+  }
+});
+
+const username = computed(() => {
+  const info = userStore.userInfo as any;
+  return (
+    info?.nickName
+    || info?.realName
+    || info?.username
+    || info?.userName
+    || info?.user?.nickName
+    || info?.user?.realName
+    || info?.user?.username
+    || '用户'
+  );
+});
 </script>
 
 <template>
