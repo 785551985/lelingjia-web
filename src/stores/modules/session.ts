@@ -80,11 +80,13 @@ export const useSessionStore = defineStore('session', () => {
       };
 
       const resArr = await get_session_list(params);
+      const rows = (resArr && resArr.rows) ? resArr.rows : [];
 
       // 预处理会话分组 并添加前缀图标
-      const res = processSessions(resArr.rows);
+      const res = processSessions(rows);
 
-      const allSessions = new Map(sessionList.value.map(item => [item.id, item])); // 现有所有数据
+      const currentList = Array.isArray(sessionList.value) ? sessionList.value : [];
+      const allSessions = new Map(currentList.map(item => [item.id, item])); // 现有所有数据
       res.forEach(item => allSessions.set(item.id, { ...item })); // 更新/添加数据
 
       // 按服务端排序重建列表（假设分页数据是按时间倒序，第一页是最新，后续页依次递减）
@@ -240,6 +242,9 @@ export const useSessionStore = defineStore('session', () => {
 
   // 在获取会话列表后添加预处理逻辑（示例）
   function processSessions(sessions: ChatSessionVo[]) {
+    if (!sessions || !Array.isArray(sessions)) {
+      return [];
+    }
     return sessions.map((session) => {
       return {
         ...session,
