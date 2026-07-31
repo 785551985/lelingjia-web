@@ -68,10 +68,10 @@ onMounted(async () => {
   // 鑾峰彇浼氳瘽鍒楄〃
   await sessionStore.requestSessionList();
 
-  // 楂樹寒鏈€鏂颁細璇?
-  if (conversationsList.value.length > 0 && sessionId.value) {
+  // 高亮最新会话
+  if (conversationsList.value.length > 0 && sessionId.value && sessionId.value !== 'undefined' && sessionId.value !== 'null') {
     const currentSessionRes = await get_session(`${sessionId.value}`);
-    // 閫氳繃 ID 鏌ヨ璇︽儏锛岃缃綋鍓嶄細璇?(鍥犱负鏈夊垎椤?
+    // 通过 ID 查询详情，设置当前会话(因为有分页)
     sessionStore.setCurrentSession(currentSessionRes.data);
   }
 });
@@ -198,12 +198,12 @@ function handleMenuCommand(command: string, item: ConversationItem<ChatSessionVo
     }"
   >
     <div class="aside-wrapper">
-      <div v-if="!designStore.isCollapse" class="aside-header">
-        <div class="flex items-center gap-8px hover:cursor-pointer" @click="handleCreatChat">
-          <el-image :src="logo" alt="logo" fit="cover" class="logo-img" />
-          <span class="logo-text max-w-150px text-overflow" :title="companyName">{{ companyName }}</span>
+      <div v-if="!designStore.isCollapse" class="aside-header flex items-center justify-between">
+        <div class="flex items-center gap-8px hover:cursor-pointer flex-1 min-w-0 mr-4px" @click="handleCreatChat">
+          <el-image :src="logo" alt="logo" fit="cover" class="logo-img flex-shrink-0" />
+          <span class="logo-text flex-1 min-w-0 leading-tight break-words text-13px font-bold text-slate-800" :title="companyName">{{ companyName }}</span>
         </div>
-        <Collapse class="ml-auto" />
+        <Collapse class="flex-shrink-0 ml-auto" />
       </div>
 
       <div class="aside-body">
@@ -325,10 +325,12 @@ function handleMenuCommand(command: string, item: ConversationItem<ChatSessionVo
         }
       }
       .logo-text {
-        font-size: 16px;
+        font-size: 13px;
         font-weight: 700;
+        line-height: 1.25;
         color: rgb(0 0 0 / 85%);
-        transform: skewX(-2deg);
+        white-space: normal;
+        word-break: break-all;
       }
     }
 

@@ -25,6 +25,16 @@ export const useAgentStore = defineStore('agent', () => {
     try {
       const res = await getAgentList();
       agentList.value = res.data;
+      if (agentList.value && agentList.value.length > 0) {
+        // 默认选中"集团官方通用 AI 助手"（或包含“通用”关键词的智能体）
+        const generalAgent = agentList.value.find(
+          item => item.agentName?.includes('通用') || item.agentName?.includes('集团官方通用')
+        ) || agentList.value[0];
+
+        if (!currentAgentInfo.value || !currentAgentInfo.value.agentName) {
+          currentAgentInfo.value = generalAgent;
+        }
+      }
     }
     catch (error) {
       console.error('requestAgentList错误', error);

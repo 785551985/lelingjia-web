@@ -5,7 +5,10 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { getKnowledgeList } from '@/api/knowledge';
 import { useAgentStore } from '@/stores/modules/agent';
 
+import { useChatStore } from '@/stores/modules/chat';
+
 const agentStore = useAgentStore();
+const chatStore = useChatStore();
 
 // 后端获取的全量知识库缓存映射
 const allKnowledgeMap = ref<Record<string, string>>({});
@@ -19,16 +22,27 @@ const kbOptions = computed(() => {
   const list = [{ id: '0', name: '全库智能检索' }];
   const agent = agentStore.currentAgentInfo;
 
-  if (agent && Array.isArray(agent.knowledgeIds) && agent.knowledgeIds.length > 0) {
-    agent.knowledgeIds.forEach((kId) => {
-      const kIdStr = String(kId);
-      // 优先显示实际知识库名；若未加载完则干练显示“专属知识库”
-      const kbName = allKnowledgeMap.value[kIdStr] || '专属知识库';
-      list.push({
-        id: kIdStr,
-        name: kbName,
-      });
-    });
+  if (agent && agent.knowledgeIds) {
+    let rawIds: any[] = [];
+    if (Array.isArray(agent.knowledgeIds)) {
+      rawIds = agent.knowledgeIds;
+    } else if (typeof agent.knowledgeIds === 'string') {
+      try {
+        rawIds = JSON.parse(agent.knowledgeIds);
+      } catch (e) {
+        rawIds = (agent.knowledgeIds as string).split(',').filter(Boolean);
+      }
+    }
+
+    if (rawIds && rawIds.length > 0) {
+      const firstId = String(rawIds[0]).trim();
+      if (firstId) {
+        list.push({
+          id: firstId,
+          name: '专属知识库',
+        });
+      }
+    }
   }
   return list;
 });
@@ -36,28 +50,22 @@ const kbOptions = computed(() => {
 function handleSelect(item: any) {
   currentKb.value = item;
   localStorage.setItem('selectedKbId', item.id);
+  chatStore.setKnowledgeId(item.id === '0' ? '' : item.id);
 }
 
-// 自动响应当前智能体的变更
+// 自动响应当前智能体的变更：有绑定专属知识库时默认选中【专属知识库】，无绑定时默认【全库智能检索】
 watch(
-  () => agentStore.currentAgentInfo,
-  (agent) => {
-    if (!agent) {
+  () => kbOptions.value,
+  (options) => {
+    if (options && options.length > 1) {
+      const exclusiveItem = options[1];
+      currentKb.value = exclusiveItem;
+      localStorage.setItem('selectedKbId', exclusiveItem.id);
+      chatStore.setKnowledgeId(exclusiveItem.id);
+    } else {
       currentKb.value = { id: '0', name: '全库智能检索' };
       localStorage.setItem('selectedKbId', '0');
-      return;
-    }
-
-    const kIds = agent.knowledgeIds;
-    if (Array.isArray(kIds) && kIds.length > 0) {
-      const firstId = String(kIds[0]);
-      const name = allKnowledgeMap.value[firstId] || '专属知识库';
-      currentKb.value = { id: firstId, name };
-      localStorage.setItem('selectedKbId', firstId);
-    }
-    else {
-      currentKb.value = { id: '0', name: '全库智能检索' };
-      localStorage.setItem('selectedKbId', '0');
+      chatStore.setKnowledgeId('');
     }
   },
   { immediate: true, deep: true },
@@ -72,16 +80,6 @@ onMounted(async () => {
         map[String(item.id)] = item.name;
       });
       allKnowledgeMap.value = map;
-
-      // 获取完真实知识库名称后，重新校准显示真正的知识库名称
-      const agent = agentStore.currentAgentInfo;
-      if (agent && Array.isArray(agent.knowledgeIds) && agent.knowledgeIds.length > 0) {
-        const firstId = String(agent.knowledgeIds[0]);
-        if (map[firstId]) {
-          currentKb.value = { id: firstId, name: map[firstId] };
-          localStorage.setItem('selectedKbId', firstId);
-        }
-      }
     }
   }
   catch (err) {

@@ -14,13 +14,16 @@ const currentWorkflow = computed(() => chatStore.currentWorkflow);
 
 onMounted(async () => {
   await agentStore.requestAgentList();
-  // 设置默认智能体（仅当未选工作流时）
+  // 默认选择集团官方通用 AI 助手（仅当未选工作流时）
   if (
     agentStore.agentList?.length > 0
     && (!agentStore.currentAgentInfo || !agentStore.currentAgentInfo.agentName)
     && !currentWorkflow.value
   ) {
-    agentStore.setCurrentAgentInfo(agentStore.agentList[0]);
+    const generalAgent = agentStore.agentList.find(
+      item => item.agentName?.includes('通用') || item.agentName?.includes('集团官方通用')
+    ) || agentStore.agentList[0];
+    agentStore.setCurrentAgentInfo(generalAgent);
   }
 });
 

@@ -25,8 +25,10 @@ export default defineConfig((cnf) => {
         },
       },
     },
-    // 浏览器缓存问题
+    // 浏览器缓存问题与监听网络绑定
     server: {
+      host: '0.0.0.0',
+      port: 5173,
       headers: {
         'Cache-Control': 'no-store',
       },

@@ -36,6 +36,9 @@ try {
 
     const cleanUrl = window.location.origin + window.location.pathname;
     window.history.replaceState({}, document.title, cleanUrl);
+    
+    // 异步拉取并填充用户信息与头像
+    userStore.fetchUserInfo();
   }
 } catch (e) {
   console.warn('解析单点登录Token失败:', e);

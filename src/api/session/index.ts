@@ -19,6 +19,9 @@ export function update_session(data: ChatSessionVo) {
 }
 
 export function get_session(id: string) {
+  if (!id || id === 'undefined' || id === 'null') {
+    return Promise.resolve({ code: 200, data: null });
+  }
   return get<ChatSessionVo>(`/system/session/${id}`).json();
 }
 

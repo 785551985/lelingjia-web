@@ -13,6 +13,8 @@ export const useUserStore = defineStore(
 
     const setToken = (value: string) => {
       token.value = value;
+      isAuthExpiredHandling.value = false;
+      isLoginDialogVisible.value = false;
     };
     const clearToken = () => {
       token.value = void 0;
@@ -83,11 +85,10 @@ export const useUserStore = defineStore(
     const fetchUserInfo = async () => {
       try {
         const { getUserInfo } = await import('@/api/auth');
-        const res = await getUserInfo();
-        if (res && (res as any).user) {
-          setUserInfo((res as any).user);
-        } else if (res) {
-          setUserInfo(res as any);
+        const res: any = await getUserInfo();
+        const userData = res?.user || res?.data?.user || res?.data || res;
+        if (userData) {
+          setUserInfo(userData);
         }
       } catch (err) {
         console.warn('获取用户信息失败:', err);

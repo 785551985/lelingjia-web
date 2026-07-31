@@ -128,8 +128,8 @@ watch(
 
         // 无缓存则请求聊天记录
         await chatStore.requestChatList(`${_id_}`);
-        // 请求聊天记录后，赋值回显，并滚动到底部
-        bubbleItems.value = chatStore.chatMap[`${_id_}`] as MessageItem[];
+        // 请求聊天记录后，赋值回显，加空防护兜底
+        bubbleItems.value = (chatStore.chatMap[`${_id_}`] as MessageItem[]) || [];
 
         // 滚动到底部
         setTimeout(() => {
@@ -193,6 +193,7 @@ async function startSSE(chatContent: string) {
     const payload: SendDTO = {
       model: modelStore.currentModelInfo.modelName ?? '',
       agentId: agentStore.currentAgentInfo?.id || undefined,
+      knowledgeId: chatStore.knowledgeId || undefined,
       content: lastUserMessage?.content ?? '',
       sessionId: route.params?.id !== 'not_login' ? String(route.params?.id) : undefined,
     };
@@ -231,7 +232,7 @@ async function startSSE(chatContent: string) {
   catch (err) {
     handleError(err);
     // 出错时也要清除 loading 状态
-    if (bubbleItems.value.length) {
+    if (bubbleItems.value?.length) {
       const lastMessage = bubbleItems.value[bubbleItems.value.length - 1];
       lastMessage.loading = false;
       bubbleItems.value = [...bubbleItems.value];
@@ -239,7 +240,7 @@ async function startSSE(chatContent: string) {
   }
   finally {
     // 停止打字器状态
-    if (bubbleItems.value.length) {
+    if (bubbleItems.value?.length) {
       const lastMessage = bubbleItems.value[bubbleItems.value.length - 1];
       lastMessage.typing = false;
       // 无条件重置 loading（停止打字动画）
@@ -733,6 +734,9 @@ function copyToClipboard(text: string, key: number) {
 }
 
 function addMessage(message: string, isUser: boolean) {
+  if (!bubbleItems.value || !Array.isArray(bubbleItems.value)) {
+    bubbleItems.value = [];
+  }
   const i = bubbleItems.value.length;
   const obj: MessageItem = {
     key: i,

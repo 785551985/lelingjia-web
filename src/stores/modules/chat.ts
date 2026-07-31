@@ -107,8 +107,8 @@ export const useChatStore = defineStore('chat', () => {
 
   // 获取当前会话的聊天记录
   const requestChatList = async (sessionId: string) => {
-    // 如果没有 token 则不查询聊天记录
-    if (!userStore.token)
+    // 如果没有 token 或 sessionId 无效，则不查询聊天记录
+    if (!userStore.token || !sessionId || sessionId === 'undefined' || sessionId === 'null')
       return;
     try {
       const res = await getChatList({
