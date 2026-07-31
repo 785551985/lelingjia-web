@@ -26,10 +26,12 @@ const kbOptions = computed(() => {
     let rawIds: any[] = [];
     if (Array.isArray(agent.knowledgeIds)) {
       rawIds = agent.knowledgeIds;
-    } else if (typeof agent.knowledgeIds === 'string') {
+    }
+    else if (typeof agent.knowledgeIds === 'string') {
       try {
         rawIds = JSON.parse(agent.knowledgeIds);
-      } catch (e) {
+      }
+      catch (e) {
         rawIds = (agent.knowledgeIds as string).split(',').filter(Boolean);
       }
     }
@@ -62,7 +64,8 @@ watch(
       currentKb.value = exclusiveItem;
       localStorage.setItem('selectedKbId', exclusiveItem.id);
       chatStore.setKnowledgeId(exclusiveItem.id);
-    } else {
+    }
+    else {
       currentKb.value = { id: '0', name: '全库智能检索' };
       localStorage.setItem('selectedKbId', '0');
       chatStore.setKnowledgeId('');

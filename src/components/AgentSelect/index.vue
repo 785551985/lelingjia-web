@@ -21,7 +21,7 @@ onMounted(async () => {
     && !currentWorkflow.value
   ) {
     const generalAgent = agentStore.agentList.find(
-      item => item.agentName?.includes('通用') || item.agentName?.includes('集团官方通用')
+      item => item.agentName?.includes('通用') || item.agentName?.includes('集团官方通用'),
     ) || agentStore.agentList[0];
     agentStore.setCurrentAgentInfo(generalAgent);
   }

@@ -4,6 +4,7 @@ import type { AnyObject } from 'typescript-api-pro';
 import type { BubbleProps } from 'vue-element-plus-x/types/Bubble';
 import type { BubbleListInstance } from 'vue-element-plus-x/types/BubbleList';
 import type { ThinkingStatus } from 'vue-element-plus-x/types/Thinking';
+import type { KnowledgeSource } from './components/SourceReferenceCard.vue';
 import type { ToolCallInfo, WfNodeEvent } from './types';
 import type { SendDTO, WfNodeInput, WfNodeInputDef } from '@/api/chat/types';
 import { useHookFetch } from 'hook-fetch/vue';
@@ -16,9 +17,9 @@ import { useChatStore } from '@/stores/modules/chat';
 import { useModelStore } from '@/stores/modules/model';
 import { useUserStore } from '@/stores/modules/user';
 import { codeXRender } from '@/utils/markdownRenderers';
+import SourceReferenceCard from './components/SourceReferenceCard.vue';
 import ToolCallCard from './components/ToolCallCard.vue';
 import WfNodeCard from './components/WfNodeCard.vue';
-import SourceReferenceCard, { type KnowledgeSource } from './components/SourceReferenceCard.vue';
 
 type MessageItem = BubbleProps & {
   key: number;
@@ -403,7 +404,8 @@ function handleDataChunk(chunk: AnyObject | string): boolean {
             const parsedSources = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;
             lastMessage.sources = Array.isArray(parsedSources) ? parsedSources : [];
             bubbleItems.value = [...bubbleItems.value];
-          } catch (err) {
+          }
+          catch (err) {
             console.warn('[SSE] 解析 sources 异常:', err);
           }
         }

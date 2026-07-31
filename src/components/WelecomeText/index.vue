@@ -1,7 +1,6 @@
 <!-- 欢迎提示词 -->
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
-import { Typewriter } from 'vue-element-plus-x';
 import { useTimeGreeting } from '@/hooks/useTimeGreeting';
 import { useUserStore } from '@/stores';
 
@@ -16,17 +15,17 @@ onMounted(() => {
 
 const username = computed(() => {
   const info = userStore.userInfo as any;
-  const targetName =
-    info?.nickName
-    || info?.nickname
-    || info?.realName
-    || info?.username
-    || info?.userName
-    || info?.user?.nickName
-    || info?.user?.nickname
-    || info?.user?.realName
-    || info?.user?.username
-    || info?.user?.userName
+  const targetName
+    = info?.nickName
+      || info?.nickname
+      || info?.realName
+      || info?.username
+      || info?.userName
+      || info?.user?.nickName
+      || info?.user?.nickname
+      || info?.user?.realName
+      || info?.user?.username
+      || info?.user?.userName
     || info?.data?.user?.nickName
     || info?.data?.user?.nickname
     || info?.data?.user?.realName
