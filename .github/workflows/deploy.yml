@@ -11,11 +11,10 @@ jobs:
       - name: 1. 拉取代码
         uses: actions/checkout@v4
 
-      - name: 2. 设置 Node.js 环境并开启依赖缓存
+      - name: 2. 设置 Node.js 环境
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
 
       - name: 3. 安装依赖并构建
         run: |
