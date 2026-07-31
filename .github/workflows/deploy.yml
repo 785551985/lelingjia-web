@@ -1,0 +1,49 @@
+name: 部署问答客户端 (chat.ylglxt.cn)
+
+on:
+  workflow_dispatch: # 仅在 GitHub 网页端手动点击 "Run workflow" 按钮时触发部署
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 2. 设置 Node.js 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: 3. 安装依赖并构建
+        run: |
+          npm install --legacy-peer-deps
+          npm run build
+
+      - name: 4. 打包构建产物
+        run: |
+          tar -czvf dist.tar.gz -C dist .
+
+      - name: 5. 上传构建包到服务器
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          source: 'dist.tar.gz'
+          target: '/www/wwwroot/chat.ylglxt.cn/'
+
+      - name: 6. 远程解压与生效
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            cd /www/wwwroot/chat.ylglxt.cn/
+            tar -zxvf dist.tar.gz && rm -f dist.tar.gz
+            echo "✅ 问答客户端部署成功！"
