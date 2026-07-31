@@ -1,5 +1,6 @@
-import path from 'node:path';
-import process from 'node:process';
+process.env.ROLLUP_SKIP_NODE_NATIVE_DEPENDENCY = 'true';
+
+import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import plugins from './.build/plugins';
 
