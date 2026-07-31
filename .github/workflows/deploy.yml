@@ -18,9 +18,11 @@ jobs:
           cache: 'npm'
 
       - name: 3. 安装依赖并构建
+        env:
+          ROLLUP_SKIP_NODE_NATIVE_DEPENDENCY: 'true'
         run: |
-          npm install --legacy-peer-deps
-          ROLLUP_SKIP_NODE_NATIVE_DEPENDENCY=true npm run build
+          npm install --legacy-peer-deps --no-optional
+          npm run build
 
       - name: 4. 打包构建产物
         run: |
