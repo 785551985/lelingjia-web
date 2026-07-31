@@ -1,4 +1,4 @@
-import path from 'node:path';
+import path from 'path';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 
 const root = path.resolve(__dirname, '../../');
