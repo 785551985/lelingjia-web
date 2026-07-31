@@ -20,7 +20,7 @@ jobs:
       - name: 3. 安装依赖并构建
         run: |
           npm install --legacy-peer-deps
-          npm run build
+          ROLLUP_SKIP_NODE_NATIVE_DEPENDENCY=true npm run build
 
       - name: 4. 打包构建产物
         run: |
