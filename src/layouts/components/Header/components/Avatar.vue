@@ -8,7 +8,7 @@ import { useSessionStore } from '@/stores/modules/session';
 const userStore = useUserStore();
 const sessionStore = useSessionStore();
 const userInitial = computed(() => {
-  const name = userStore.userInfo?.userName || userStore.userInfo?.nickName || 'Admin';
+  const name = userStore.userInfo?.username || userStore.userInfo?.nickName || 'Admin';
   return name.charAt(0).toUpperCase();
 });
 

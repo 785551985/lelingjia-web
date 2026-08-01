@@ -46,8 +46,11 @@ const userStore = useUserStore();
 
 // 用户头像
 const avatar = computed(() => {
-  const userInfo = userStore.userInfo;
-  return userInfo?.avatar || 'https://avatars.githubusercontent.com/u/32251822?s=96&v=4';
+  const rawAvatar = userStore.userInfo?.avatar;
+  if (rawAvatar && typeof rawAvatar === 'string' && rawAvatar.trim().length > 0 && !rawAvatar.includes('undefined')) {
+    return rawAvatar;
+  }
+  return 'https://api.dicebear.com/7.x/avataaars/svg?seed=UserNav';
 });
 
 const inputValue = ref('');
