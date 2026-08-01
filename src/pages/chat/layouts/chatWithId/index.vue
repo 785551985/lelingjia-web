@@ -53,6 +53,11 @@ const avatar = computed(() => {
   return 'https://api.dicebear.com/7.x/avataaars/svg?seed=UserNav';
 });
 
+const userInitial = computed(() => {
+  const name = userStore.userInfo?.username || userStore.userInfo?.nickName || 'A';
+  return name.charAt(0).toUpperCase();
+});
+
 const inputValue = ref('');
 const chatSenderRef = ref<InstanceType<typeof ChatSender> | null>(null);
 const bubbleItems = ref<MessageItem[]>([]);
@@ -827,6 +832,15 @@ function sendMessageByKey(key: number) {
       </Transition>
 
       <BubbleList ref="bubbleListRef" :list="bubbleItems" max-height="calc(100vh - 240px)">
+        <template #avatar="{ item }">
+          <div v-if="item.role === 'user'" class="user-chat-avatar">
+            <span>{{ userInitial }}</span>
+          </div>
+          <div v-else class="ai-chat-avatar">
+            <img src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png">
+          </div>
+        </template>
+
         <template #header="{ item }">
           <Thinking
             v-if="item.reasoning_content"
@@ -1100,5 +1114,27 @@ function sendMessageByKey(key: number) {
     display: flex;
     justify-content: flex-end;
   }
+}
+
+.user-chat-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+  user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.ai-chat-avatar img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
 }
 </style>
