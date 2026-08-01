@@ -64,6 +64,8 @@ async function handleSubmit() {
       throw new Error('登录响应中缺少访问令牌');
     userStore.setToken(token);
     userStore.resetAuthExpiredHandling();
+    // 登录成功后立即获取最新用户信息（更新企业名称与用户名等）
+    await userStore.fetchUserInfo();
     ElMessage.success('登录成功');
     userStore.closeLoginDialog();
     // 立刻获取会话列表
