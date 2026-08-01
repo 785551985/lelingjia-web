@@ -164,6 +164,15 @@ async function startSSE(chatContent: string) {
     return;
   }
 
+  if (isLoading.value) {
+    try {
+      cancel();
+    }
+    catch (e) {
+      console.warn('取消上一次未完成的请求:', e);
+    }
+  }
+
   try {
     // 清空上一次的工具调用事件
     toolCallEvents.value = [];

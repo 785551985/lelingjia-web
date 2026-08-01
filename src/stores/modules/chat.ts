@@ -59,11 +59,12 @@ export const useChatStore = defineStore('chat', () => {
 
   const setChatMap = (id: string, data: ChatMessageVo[]) => {
     chatMap.value[id] = data?.map((item: ChatMessageVo) => {
-      const isUser = item.role === 'user';
-      const originalContent = item.content as string;
+      const roleStr = String(item.role || '').toLowerCase().trim();
+      const isUser = roleStr === 'user';
+      const originalContent = (item.content || '') as string;
 
       const thinkContent = extractThkContent(originalContent);
-      let afterThinkContent = extractThkContentAfter(originalContent);
+      const afterThinkContent = extractThkContentAfter(originalContent);
       const { sources, cleanContent } = extractSources(afterThinkContent);
 
       const result = {
@@ -71,7 +72,7 @@ export const useChatStore = defineStore('chat', () => {
         key: item.id,
         placement: isUser ? 'end' : 'start',
         isMarkdown: !isUser,
-        role: isUser ? 'user' : 'system',
+        role: isUser ? 'user' : 'assistant',
         avatar: isUser
           ? avatar
           : 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
@@ -80,7 +81,7 @@ export const useChatStore = defineStore('chat', () => {
         reasoning_content: thinkContent,
         thinkingStatus: 'end',
         content: cleanContent,
-        sources: sources,
+        sources,
         thinlCollapse: false,
         noStyle: !isUser,
       };
@@ -90,7 +91,8 @@ export const useChatStore = defineStore('chat', () => {
   };
 
   function extractSources(content: string) {
-    if (!content) return { sources: [], cleanContent: content };
+    if (!content)
+      return { sources: [], cleanContent: content };
     const regex = /<sources>([\s\S]*?)<\/sources>/;
     const match = content.match(regex);
     if (match) {
@@ -98,7 +100,8 @@ export const useChatStore = defineStore('chat', () => {
         const sources = JSON.parse(match[1]);
         const cleanContent = content.replace(regex, '').trim();
         return { sources, cleanContent };
-      } catch (e) {
+      }
+      catch (e) {
         console.error('Failed to parse sources JSON', e);
       }
     }
