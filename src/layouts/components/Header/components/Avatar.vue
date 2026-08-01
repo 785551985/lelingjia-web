@@ -7,9 +7,13 @@ import { useSessionStore } from '@/stores/modules/session';
 
 const userStore = useUserStore();
 const sessionStore = useSessionStore();
-const src = computed(
-  () => userStore.userInfo?.avatar ?? 'https://avatars.githubusercontent.com/u/32251822?s=96&v=4',
-);
+const src = computed(() => {
+  const rawAvatar = userStore.userInfo?.avatar || userStore.avatar;
+  if (rawAvatar && typeof rawAvatar === 'string' && rawAvatar.trim().length > 0 && !rawAvatar.includes('undefined')) {
+    return rawAvatar;
+  }
+  return 'https://api.dicebear.com/7.x/avataaars/svg?seed=LelingjiaUser';
+});
 
 /* 弹出面板 开始 */
 const popoverStyle = ref({
@@ -93,7 +97,9 @@ function handleClick(item: any) {
     >
       <!-- 触发元素插槽 -->
       <template #trigger>
-        <el-avatar :src="src" :size="28" fit="cover" shape="circle" />
+        <el-avatar :src="src" :size="32" fit="cover" shape="circle" @error="() => true">
+          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=LelingjiaUser">
+        </el-avatar>
       </template>
 
       <div class="popover-content-box shadow-lg">
