@@ -7,12 +7,13 @@ import { useSessionStore } from '@/stores/modules/session';
 
 const userStore = useUserStore();
 const sessionStore = useSessionStore();
-const src = computed(() => {
+const hasCustomAvatar = computed(() => {
   const rawAvatar = userStore.userInfo?.avatar;
-  if (rawAvatar && typeof rawAvatar === 'string' && rawAvatar.trim().length > 0 && !rawAvatar.includes('undefined')) {
-    return rawAvatar;
-  }
-  return 'https://api.dicebear.com/7.x/avataaars/svg?seed=LelingjiaUser';
+  return !!(rawAvatar && typeof rawAvatar === 'string' && rawAvatar.trim().length > 0 && !rawAvatar.includes('undefined'));
+});
+
+const src = computed(() => {
+  return hasCustomAvatar.value ? (userStore.userInfo?.avatar as string) : '';
 });
 
 /* 弹出面板 开始 */
@@ -97,9 +98,14 @@ function handleClick(item: any) {
     >
       <!-- 触发元素插槽 -->
       <template #trigger>
-        <el-avatar :src="src" :size="32" fit="cover" shape="circle" @error="() => true">
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=LelingjiaUser">
-        </el-avatar>
+        <div class="user-avatar-badge flex-center">
+          <el-avatar v-if="hasCustomAvatar" :src="src" :size="32" fit="cover" shape="circle" />
+          <div v-else class="default-gradient-avatar flex-center">
+            <svg viewBox="0 0 1024 1024" width="20" height="20" fill="currentColor">
+              <path d="M512 512a192 192 0 1 0 0-384 192 192 0 0 0 0 384z m0 64c-169.6 0-512 85.333-512 256v64h1024v-64c0-170.667-342.4-256-512-256z" />
+            </svg>
+          </div>
+        </div>
       </template>
 
       <div class="popover-content-box shadow-lg">
@@ -133,5 +139,17 @@ function handleClick(item: any) {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   box-shadow: 0 4px 16px rgb(0 0 0 / 8%);
+}
+
+.default-gradient-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
 }
 </style>
