@@ -28,6 +28,10 @@ function jwtPlugin(): HookFetchPlugin<BaseResponse> {
       config.headers = new Headers(config.headers);
       config.headers.set('authorization', `Bearer ${userStore.token}`);
       config.headers.set('ClientID', import.meta.env.VITE_CLIENT_ID);
+      if (userStore.userInfo?.tenantId) {
+        config.headers.set('client-tenant-id', userStore.userInfo.tenantId);
+        config.headers.set('tenant-id', userStore.userInfo.tenantId);
+      }
       return config;
     },
     afterResponse: async (response) => {
