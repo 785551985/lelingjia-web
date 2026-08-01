@@ -17,7 +17,7 @@ const app = createApp(App);
 
 app.use(store);
 
-// 处理从 ruoyi-admin (5666) 单点跳转过来的免登 Token
+// 处理从 ruoyi-admin 单点跳转过来的免登 Token
 try {
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get('token');
@@ -27,18 +27,38 @@ try {
     userStore.setToken(cleanToken);
     localStorage.setItem('Admin-Token', cleanToken);
     
+    // 解析 JWT 中的 tenantId 并同步存入租户上下文
+    try {
+      const parts = cleanToken.split('.');
+      if (parts.length >= 2) {
+        const payloadStr = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+        const payload = JSON.parse(decodeURIComponent(escape(payloadStr)));
+        if (payload.tenantId) {
+          userStore.setTenantId(payload.tenantId);
+          localStorage.setItem('Tenant-Id', payload.tenantId);
+        }
+      }
+    } catch (err) {
+      console.warn('解析 Token 中的 tenantId 异常:', err);
+    }
+
     // 同步更新 pinia-plugin-persistedstate 对应的 user 本地对象
     try {
       const userObj = JSON.parse(localStorage.getItem('user') || '{}');
       userObj.token = cleanToken;
       localStorage.setItem('user', JSON.stringify(userObj));
-    } catch (ignored) {}
+    } catch {}
 
     const cleanUrl = window.location.origin + window.location.pathname;
     window.history.replaceState({}, document.title, cleanUrl);
     
-    // 异步拉取并填充用户信息与头像
-    userStore.fetchUserInfo();
+    // 异步拉取并填充用户信息与头像，成功后刷新当前租户下的最新会话列表
+    userStore.fetchUserInfo().then(async () => {
+      try {
+        const { useSessionStore } = await import('@/stores/modules/session');
+        useSessionStore().requestSessionList();
+      } catch {}
+    });
   }
 } catch (e) {
   console.warn('解析单点登录Token失败:', e);

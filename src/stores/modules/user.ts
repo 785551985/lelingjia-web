@@ -8,8 +8,18 @@ export const useUserStore = defineStore(
   'user',
   () => {
     const token = ref<string>();
+    const tenantId = ref<string>(localStorage.getItem('Tenant-Id') || '');
     const router = useRouter();
     const loginRedirectPath = ref<string>('');
+    const isAuthExpiredHandling = ref(false);
+    const isLoginDialogVisible = ref(false);
+
+    const setTenantId = (value: string) => {
+      tenantId.value = value;
+      if (value) {
+        localStorage.setItem('Tenant-Id', value);
+      }
+    };
 
     const setToken = (value: string) => {
       token.value = value;
@@ -45,10 +55,7 @@ export const useUserStore = defineStore(
       return path;
     };
 
-    const isAuthExpiredHandling = ref(false);
-
     // 登录弹框状态
-    const isLoginDialogVisible = ref(false);
     const openLoginDialog = () => {
       isLoginDialogVisible.value = true;
     };
@@ -99,6 +106,8 @@ export const useUserStore = defineStore(
       token,
       setToken,
       clearToken,
+      tenantId,
+      setTenantId,
       userInfo,
       setUserInfo,
       fetchUserInfo,
