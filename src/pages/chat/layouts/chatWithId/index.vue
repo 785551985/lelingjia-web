@@ -474,6 +474,15 @@ function handleDataChunk(chunk: AnyObject | string): boolean {
       if (directContent) {
         handleContentChunk(directContent);
       }
+
+      if (chunk?.done === true) {
+        console.log('[SSE] 流对象完成');
+        const lastMessage = bubbleItems.value[bubbleItems.value.length - 1];
+        if (lastMessage) {
+          lastMessage.loading = false;
+        }
+        return true;
+      }
     }
   }
   catch (err) {
