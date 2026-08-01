@@ -7,6 +7,11 @@ import { useSessionStore } from '@/stores/modules/session';
 
 const userStore = useUserStore();
 const sessionStore = useSessionStore();
+const userInitial = computed(() => {
+  const name = userStore.userInfo?.userName || userStore.userInfo?.nickName || 'Admin';
+  return name.charAt(0).toUpperCase();
+});
+
 const hasCustomAvatar = computed(() => {
   const rawAvatar = userStore.userInfo?.avatar;
   return !!(rawAvatar && typeof rawAvatar === 'string' && rawAvatar.trim().length > 0 && !rawAvatar.includes('undefined'));
@@ -98,12 +103,10 @@ function handleClick(item: any) {
     >
       <!-- 触发元素插槽 -->
       <template #trigger>
-        <div class="user-avatar-badge flex-center">
-          <el-avatar v-if="hasCustomAvatar" :src="src" :size="32" fit="cover" shape="circle" />
-          <div v-else class="default-gradient-avatar flex-center">
-            <svg viewBox="0 0 1024 1024" width="20" height="20" fill="currentColor">
-              <path d="M512 512a192 192 0 1 0 0-384 192 192 0 0 0 0 384z m0 64c-169.6 0-512 85.333-512 256v64h1024v-64c0-170.667-342.4-256-512-256z" />
-            </svg>
+        <div class="user-avatar-badge hover:scale-105 transition-all duration-200">
+          <el-avatar v-if="hasCustomAvatar" :src="src" :size="34" fit="cover" shape="circle" class="shadow-sm border-2 border-white" />
+          <div v-else class="default-gradient-avatar">
+            <span class="avatar-initial">{{ userInitial }}</span>
           </div>
         </div>
       </template>
@@ -142,14 +145,24 @@ function handleClick(item: any) {
 }
 
 .default-gradient-avatar {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+  user-select: none;
+}
+
+.avatar-initial {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 </style>
