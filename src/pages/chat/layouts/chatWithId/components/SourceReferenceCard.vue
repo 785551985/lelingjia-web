@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import {
+  ArrowRight,
+  FolderOpened,
+  Lock,
+} from '@element-plus/icons-vue';
 import { ref } from 'vue';
 import { useUserStore } from '@/stores';
-import {
-  FolderOpened,
-  ArrowRight,
-  Lock
-} from '@element-plus/icons-vue';
-import WatermarkPreviewModal from './WatermarkPreviewModal.vue';
 import ApplyDownloadModal from './ApplyDownloadModal.vue';
+import WatermarkPreviewModal from './WatermarkPreviewModal.vue';
 
 export interface KnowledgeSource {
   docId?: string;
@@ -21,18 +21,19 @@ export interface KnowledgeSource {
   isSensitive?: boolean;
 }
 
-const props = defineProps<{
+defineProps<{
   sources: KnowledgeSource[];
 }>();
 
 const userStore = useUserStore();
-const isExpanded = ref(true);
+const isExpanded = ref(false);
 
 // Sensitive Keywords
 const SENSITIVE_KEYWORDS = ['营业执照', '公章', '资质', '身份证', '法人', '财报', '财务报表', '许可', '商标', '专利', '合同'];
 
 function isSensitiveFile(source: KnowledgeSource): boolean {
-  if (source.isSensitive) return true;
+  if (source.isSensitive)
+    return true;
   const name = source.name || '';
   return SENSITIVE_KEYWORDS.some(k => name.includes(k));
 }
@@ -59,15 +60,20 @@ function openApply(source: KnowledgeSource) {
 
 function getExtBadge(name: string) {
   const ext = (name.split('.').pop() || '').toLowerCase();
-  if (ext === 'pdf') return { text: 'PDF', color: '#f56c6c', bg: '#fef0f0' };
-  if (['doc', 'docx'].includes(ext)) return { text: 'DOC', color: '#409eff', bg: '#ecf5ff' };
-  if (['xls', 'xlsx'].includes(ext)) return { text: 'XLS', color: '#67c23a', bg: '#f0f9eb' };
-  if (['png', 'jpg', 'jpeg'].includes(ext)) return { text: 'IMG', color: '#e6a23c', bg: '#fdf6ec' };
+  if (ext === 'pdf')
+    return { text: 'PDF', color: '#f56c6c', bg: '#fef0f0' };
+  if (['doc', 'docx'].includes(ext))
+    return { text: 'DOC', color: '#409eff', bg: '#ecf5ff' };
+  if (['xls', 'xlsx'].includes(ext))
+    return { text: 'XLS', color: '#67c23a', bg: '#f0f9eb' };
+  if (['png', 'jpg', 'jpeg'].includes(ext))
+    return { text: 'IMG', color: '#e6a23c', bg: '#fdf6ec' };
   return { text: 'FILE', color: '#909399', bg: '#f4f4f5' };
 }
 
 function getFileUrl(source: KnowledgeSource | null): string {
-  if (!source || !source.downloadUrl) return '';
+  if (!source || !source.downloadUrl)
+    return '';
   let url = source.downloadUrl.replace('/resource/oss/download/', '/resource/oss/preview/');
   if (!url.startsWith('http')) {
     const baseUrl = import.meta.env.VITE_API_URL || '';
@@ -76,9 +82,9 @@ function getFileUrl(source: KnowledgeSource | null): string {
   const token = userStore.token || localStorage.getItem('token') || '';
   const clientId = import.meta.env.VITE_CLIENT_ID || 'e5cd7e4891bf95d1d19206ce24a7b32e';
   if (token && !url.includes('Authorization=')) {
-    const authParam = `Authorization=${encodeURIComponent('Bearer ' + token)}`;
+    const authParam = `Authorization=${encodeURIComponent(`Bearer ${token}`)}`;
     const clientParam = `client_id=${encodeURIComponent(clientId)}&ClientID=${encodeURIComponent(clientId)}`;
-    url += (url.includes('?') ? '&' : '?') + `${authParam}&${clientParam}`;
+    url += `${url.includes('?') ? '&' : '?'}${authParam}&${clientParam}`;
   }
   return url;
 }
@@ -89,7 +95,9 @@ function getFileUrl(source: KnowledgeSource | null): string {
     <!-- Sleek Bar Header -->
     <div class="bar-header" @click="toggleExpand">
       <div class="header-left">
-        <el-icon class="header-icon"><FolderOpened /></el-icon>
+        <el-icon class="header-icon">
+          <FolderOpened />
+        </el-icon>
         <span class="header-title">参考来源</span>
         <span class="count-badge">{{ sources.length }} 篇关联文档</span>
       </div>
@@ -130,7 +138,6 @@ function getFileUrl(source: KnowledgeSource | null): string {
                 <el-icon style="margin-right: 2px;"><Lock /></el-icon>机密资质
               </span>
             </div>
-
           </div>
         </div>
       </div>
