@@ -8,7 +8,7 @@ import { useSessionStore } from '@/stores/modules/session';
 const userStore = useUserStore();
 const sessionStore = useSessionStore();
 const src = computed(() => {
-  const rawAvatar = userStore.userInfo?.avatar || userStore.avatar;
+  const rawAvatar = userStore.userInfo?.avatar;
   if (rawAvatar && typeof rawAvatar === 'string' && rawAvatar.trim().length > 0 && !rawAvatar.includes('undefined')) {
     return rawAvatar;
   }
