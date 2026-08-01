@@ -21,7 +21,7 @@ export const useChatStore = defineStore('chat', () => {
   // 用户头像
   const avatar = computed(() => {
     const userInfo = userStore.userInfo;
-    return userInfo?.avatar || userStore.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=UserNav';
+    return userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=UserNav';
   });
 
   // 是否开启深度思考
