@@ -42,7 +42,8 @@ onKeyStroke(event => event.ctrlKey && event.key.toLowerCase() === 'k', handleCtr
 });
 function goToAdmin() {
   const token = userStore.token;
-  const targetUrl = `http://localhost:5666/${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+  const adminBaseUrl = import.meta.env.VITE_ADMIN_URL || 'https://mgr.ylglxt.cn';
+  const targetUrl = `${adminBaseUrl}/${token ? `?token=${encodeURIComponent(token)}` : ''}`;
   window.location.href = targetUrl;
 }
 </script>

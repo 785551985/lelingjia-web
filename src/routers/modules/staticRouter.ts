@@ -5,14 +5,14 @@ export const layoutRouter: RouteRecordRaw[] = [
   {
     path: '/admin-login',
     redirect: () => {
-      window.location.href = 'http://localhost:5666/';
+      window.location.href = import.meta.env.VITE_ADMIN_URL || 'https://mgr.ylglxt.cn';
       return '/';
     },
   },
   {
     path: '/admin',
     redirect: () => {
-      window.location.href = 'http://localhost:5666/';
+      window.location.href = import.meta.env.VITE_ADMIN_URL || 'https://mgr.ylglxt.cn';
       return '/';
     },
   },

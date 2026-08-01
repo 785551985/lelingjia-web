@@ -52,7 +52,7 @@ function handleClick(item: any) {
   switch (item.key) {
     case 'admin':
       popoverRef.value?.hide?.();
-      window.location.href = 'http://localhost:5666/';
+      window.location.href = import.meta.env.VITE_ADMIN_URL || 'https://mgr.ylglxt.cn';
       break;
     case '4':
       popoverRef.value?.hide?.();

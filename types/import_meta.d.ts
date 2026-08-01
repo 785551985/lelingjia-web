@@ -7,6 +7,7 @@ interface ImportMetaEnv {
   readonly VITE_WEB_BASE_API: string;
   readonly VITE_API_URL: string;
   readonly VITE_CLIENT_ID: string;
+  readonly VITE_ADMIN_URL: string;
 }
 
 declare interface ImportMeta {
