@@ -472,6 +472,10 @@ function handleDataChunk(chunk: AnyObject | string): boolean {
 
       const directContent = chunk?.content;
       if (directContent) {
+        const lastMessage = bubbleItems.value[bubbleItems.value.length - 1];
+        if (lastMessage) {
+          lastMessage.loading = false;
+        }
         handleContentChunk(directContent);
       }
 
