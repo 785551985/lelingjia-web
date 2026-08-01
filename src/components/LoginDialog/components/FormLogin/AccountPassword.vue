@@ -2,19 +2,19 @@
 <script lang="ts" setup>
 import type { FormInstance, FormRules } from 'element-plus';
 import type { LoginDTO } from '@/api/auth/types';
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { login } from '@/api';
+import { getTenantList, login } from '@/api';
 import { useUserStore } from '@/stores';
-import { useLoginFormStore } from '@/stores/modules/loginForm';
 import { useSessionStore } from '@/stores/modules/session';
 
 const userStore = useUserStore();
 const sessionStore = useSessionStore();
-const loginFromStore = useLoginFormStore();
 
 const formRef = ref<FormInstance>();
 const isSubmitting = ref(false);
+const tenantOptions = ref<Array<{ tenantId: string; companyName: string }>>([]);
+const tenantEnabled = ref(true);
 
 const formModel = reactive<LoginDTO>({
   username: '',
@@ -26,11 +26,30 @@ const formModel = reactive<LoginDTO>({
 });
 
 const rules = reactive<FormRules<LoginDTO>>({
+  tenantId: [{ required: true, message: '请选择企业', trigger: 'change' }],
   username: [{ required: true, message: '请输入账号', trigger: 'blur' }],
   password: [{ required: true, message: '请输入登录密码', trigger: 'blur' }],
 });
 
 const router = useRouter();
+
+onMounted(async () => {
+  try {
+    const res = await getTenantList();
+    const data = res?.data ?? res;
+    if (data?.voList && data.voList.length > 0) {
+      tenantOptions.value = data.voList;
+      tenantEnabled.value = data.tenantEnabled ?? true;
+      if (!formModel.tenantId && tenantOptions.value.length > 0) {
+        formModel.tenantId = tenantOptions.value[0].tenantId;
+      }
+    }
+  }
+  catch (err) {
+    console.error('获取企业列表失败:', err);
+  }
+});
+
 async function handleSubmit() {
   if (isSubmitting.value)
     return;
@@ -44,11 +63,10 @@ async function handleSubmit() {
     if (!token)
       throw new Error('登录响应中缺少访问令牌');
     userStore.setToken(token);
-    // res.data.userInfo && userStore.setUserInfo(res.data.userInfo);
     userStore.resetAuthExpiredHandling();
     ElMessage.success('登录成功');
     userStore.closeLoginDialog();
-    // 立刻获取回话列表
+    // 立刻获取会话列表
     await sessionStore.requestSessionList(1, true);
     const redirectPath = userStore.consumeLoginRedirectPath();
     router.replace(redirectPath || '/');
@@ -72,6 +90,25 @@ async function handleSubmit() {
       class="login-form"
       @submit.prevent="handleSubmit"
     >
+      <el-form-item v-if="tenantEnabled && tenantOptions.length > 0" prop="tenantId">
+        <el-select
+          v-model="formModel.tenantId"
+          placeholder="请选择企业"
+          class="w-full"
+        >
+          <template #prefix>
+            <el-icon>
+              <OfficeBuilding />
+            </el-icon>
+          </template>
+          <el-option
+            v-for="item in tenantOptions"
+            :key="item.tenantId"
+            :label="item.companyName"
+            :value="item.tenantId"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item prop="username">
         <el-input v-model="formModel.username" placeholder="请输入账号">
           <template #prefix>
@@ -108,13 +145,6 @@ async function handleSubmit() {
       </el-form-item>
     </el-form>
 
-    <!-- 注册登录 -->
-    <div class="form-tip font-size-12px flex items-center">
-      <span>没有账号，</span>
-      <span class="link-action" @click="loginFromStore.setLoginFormType('RegistrationForm')">
-        立即注册
-      </span>
-    </div>
     <p class="security-tip">
       登录即代表你同意平台服务条款，我们会妥善保护你的账号信息。
     </p>
@@ -156,17 +186,20 @@ async function handleSubmit() {
   line-height: 1.6;
 }
 
-:deep(.el-input__wrapper) {
+:deep(.el-input__wrapper),
+:deep(.el-select__wrapper) {
   min-height: 44px;
   border-radius: 10px;
   box-shadow: 0 0 0 1px rgb(148 163 184 / 18%);
 }
 
-:deep(.el-input__inner) {
+:deep(.el-input__inner),
+:deep(.el-select__selected-item) {
   font-size: 13px;
 }
 
-:deep(.el-input__wrapper.is-focus) {
+:deep(.el-input__wrapper.is-focus),
+:deep(.el-select__wrapper.is-focused) {
   box-shadow: 0 0 0 1px rgb(37 99 235 / 48%);
 }
 

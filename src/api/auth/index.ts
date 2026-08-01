@@ -11,3 +11,6 @@ export const register = (data: RegisterDTO) => post('/auth/register', data).json
 
 // 获取当前登录用户信息
 export const getUserInfo = () => get('/system/user/getInfo').json();
+
+// 获取租户/企业列表
+export const getTenantList = () => get<{ tenantEnabled?: boolean; voList?: Array<{ tenantId: string; companyName: string }> }>('/auth/tenant/list').json();
